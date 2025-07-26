@@ -1,32 +1,33 @@
-# Use a base image with Java 17 for your Spring Boot application
-FROM openjdk:17-jdk-slim
+# --- STAGE 1: Build the Spring Boot application ---
+# Use a Maven image to build your application
+FROM maven:3.8.5-openjdk-17 AS build
 
-# Set the working directory inside the container
+# Set the working directory inside the build stage
 WORKDIR /app
 
-# Install Maven within the Docker image. This is needed to build your project.
-RUN apt-get update && apt-get install -y maven
-
-# Copy your project's pom.xml first. This helps Docker cache the dependencies.
+# Copy your project files into the build stage
 COPY pom.xml .
-
-# Copy your source code (all files in the 'src' directory)
 COPY src ./src
 
-# Build your Spring Boot application.
-# 'mvn clean package' ensures the JAR file is created.
-# '-DskipTests' skips running tests, which speeds up the build for deployment.
+# Build the application
+# 'mvn clean package' creates the JAR in target/
+# '-DskipTests' skips tests for faster deployment builds
 RUN mvn clean package -DskipTests
 
-# IMPORTANT: This line copies your compiled JAR file to the root of the /app directory inside the container.
-# It also renames it to 'app.jar' for easier access.
-# YOU MUST ENSURE THE PART AFTER 'target/' IS THE EXACT NAME OF YOUR JAR FILE.
-# Based on your previous message, your JAR file name is 'oauth2-user-sync-home-page-demo-0.0.1-SNAPSHOT.jar'
-COPY target/oauth2-user-sync-home-page-demo-0.0.1-SNAPSHOT.jar app.jar
+# --- STAGE 2: Create the final, smaller runtime image ---
+# Use a slim OpenJDK image for the final application
+FROM openjdk:17-jdk-slim
 
-# Expose the port that your Spring Boot application listens on (default for Spring Boot is 8080)
+# Set the working directory inside the final stage
+WORKDIR /app
+
+# Copy the JAR file from the 'build' stage into the final image
+# We copy 'app.jar' from the build stage, which contains your compiled application
+# Replace 'oauth2-user-sync-home-page-demo-0.0.1-SNAPSHOT.jar' with your exact JAR name if different
+COPY --from=build /app/target/oauth2-user-sync-home-page-demo-0.0.1-SNAPSHOT.jar app.jar
+
+# Expose the port your Spring Boot application listens on
 EXPOSE 8080
 
-# Define the command to run your application when the Docker container starts.
-# It now runs 'app.jar', which is located at /app/app.jar.
+# Command to run your Spring Boot application
 CMD ["java", "-jar", "app.jar"]
