@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Shopping Cart - Milker</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <style>
+        /* General Reset & Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Open Sans', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f8f8; /* Very soft, light blue-green tint for freshness */
+            color: #333;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        h1, h2, h3 {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            color: #2c3e50; /* Darker, sophisticated blue-gray for headlines */
+        }
+
+        header {
+            background: linear-gradient(135deg, #008C8C 0%, #005f5f 100%); /* Teal gradient */
+            color: white;
+            padding: 2.5em 0; /* More vertical padding */
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15); /* More prominent shadow */
+            position: relative;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 3.2em; /* Larger font size */
+            letter-spacing: 1.5px;
+            font-weight: 700;
+            color: white; /* Keep white for contrast */
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.2);
+        }
+
+        #back-to-products {
+            position: absolute;
+            top: 25px; /* Adjust positioning */
+            left: 25px;
+            background-color: #f0f8f8; /* Light background */
+            color: #008C8C; /* Brand color text */
+            padding: 10px 18px; /* More padding */
+            border-radius: 8px; /* More rounded */
+            font-weight: 600;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1); /* Consistent shadow */
+            font-size: 1.05em;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+        #back-to-products:hover {
+            background-color: #e0f2f7; /* Lighter on hover */
+            color: #005f5f;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        main {
+            padding: 40px; /* More padding */
+            max-width: 1000px; /* Wider main container */
+            margin: 40px auto; /* More margin */
+            background-color: white;
+            border-radius: 15px; /* More rounded corners */
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1); /* Deeper shadow */
+        }
+
+        main h2 {
+            text-align: center;
+            color: #008C8C; /* Brand color for main heading */
+            margin-top: 0;
+            margin-bottom: 30px; /* More space */
+            font-size: 2.8em; /* Larger heading */
+            position: relative;
+            padding-bottom: 10px;
+        }
+
+        main h2::after {
+            content: '';
+            position: absolute;
+            width: 80px;
+            height: 3px;
+            background-color: #ff7043; /* Accent color underline */
+            left: 50%;
+            transform: translateX(-50%);
+            bottom: 0;
+            border-radius: 2px;
+        }
+
+        #cart-items-container {
+            border-top: 1px solid #e0e0e0; /* Softer border */
+            padding-top: 25px; /* More padding */
+            margin-bottom: 25px;
+        }
+
+        .cart-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px; /* More spacing */
+            padding-bottom: 20px;
+            border-bottom: 1px dashed #e0e0e0; /* Softer dashed line */
+            animation: fadeIn 0.4s ease-in-out;
+        }
+
+        .cart-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .cart-item img {
+            width: 100px; /* Larger image */
+            height: 100px; /* Larger image */
+            object-fit: cover;
+            border-radius: 8px; /* More rounded */
+            margin-right: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08); /* Subtle shadow on image */
+        }
+
+        .cart-item-details {
+            flex-grow: 1;
+        }
+
+        .cart-item-details h3 {
+            margin: 0;
+            font-size: 1.4em; /* Larger product name */
+            color: #333;
+            font-weight: 600;
+        }
+
+        .cart-item-details p {
+            margin: 8px 0; /* More spacing */
+            font-size: 1em;
+            color: #666;
+        }
+
+        .cart-item-quantity-controls {
+            display: flex;
+            align-items: center;
+            margin-top: 10px;
+        }
+
+        .cart-item-quantity-controls button {
+            background-color: #f8f8f8; /* Lighter background */
+            border: 1px solid #d0d0d0; /* Softer border */
+            padding: 8px 14px; /* More padding */
+            cursor: pointer;
+            font-size: 1.1em;
+            border-radius: 6px; /* More rounded */
+            transition: all 0.3s ease;
+            color: #555;
+            font-weight: bold;
+        }
+
+        .cart-item-quantity-controls button:hover {
+            background-color: #e8e8e8;
+            border-color: #b0b0b0;
+            transform: translateY(-1px);
+        }
+         .cart-item-quantity-controls button:active {
+            transform: translateY(0);
+            background-color: #d8d8d8;
+        }
+
+
+        .cart-item-quantity-controls span {
+            margin: 0 15px; /* More spacing */
+            font-weight: 700;
+            font-size: 1.2em;
+            color: #00758f; /* Darker teal for quantity */
+            min-width: 30px;
+            text-align: center;
+        }
+
+        .cart-item-price {
+            font-weight: 700;
+            color: #28a745; /* Green for prices */
+            margin-left: 25px;
+            width: 100px; /* Wider for price */
+            text-align: right;
+            font-size: 1.3em; /* Larger price */
+        }
+
+        .remove-item-btn {
+            background-color: #dc3545; /* Red for remove */
+            color: white;
+            border: none;
+            padding: 10px 15px; /* More padding */
+            border-radius: 8px; /* More rounded */
+            cursor: pointer;
+            font-size: 0.95em;
+            margin-left: 25px;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            display: flex; /* For icon */
+            align-items: center;
+            gap: 5px;
+        }
+
+        .remove-item-btn:hover {
+            background-color: #c82333;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        #cart-total {
+            text-align: right;
+            font-size: 1.8em; /* Larger total font */
+            font-weight: bold;
+            color: #008C8C; /* Brand color for total */
+            margin-top: 30px; /* More space */
+            padding-top: 20px;
+            border-top: 3px solid #e8f5e9; /* Softer, thicker border */
+        }
+        #cart-total-amount {
+            color: #ff7043; /* Accent color for the amount */
+            font-size: 1.1em;
+        }
+
+        #checkout-btn, #clear-cart-btn {
+            display: block;
+            width: 100%;
+            padding: 18px; /* More padding */
+            border: none;
+            border-radius: 8px;
+            font-size: 1.4em; /* Larger font */
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 20px; /* Spacing */
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            display: flex; /* For icon */
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        #checkout-btn {
+            background-color: #ff7043; /* Vibrant orange-red accent */
+            color: white;
+        }
+
+        #checkout-btn:hover {
+            background-color: #e6522c; /* Darker orange-red */
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px rgba(0,0,0,0.25);
+        }
+
+        #checkout-btn:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+            box-shadow: none;
+            transform: none;
+        }
+
+        #clear-cart-btn {
+            background-color: #6c757d; /* Muted gray for clear */
+            color: white;
+            margin-top: 15px; /* Spacing */
+        }
+
+        #clear-cart-btn:hover {
+            background-color: #5a6268;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px rgba(0,0,0,0.25);
+        }
+
+        .loading-message, .empty-cart-message, .error-message {
+            text-align: center;
+            font-style: italic;
+            color: #777;
+            padding: 30px; /* More padding */
+            font-size: 1.1em;
+            background-color: #fcfcfc;
+            border-radius: 10px;
+            margin: 20px 0;
+            border: 1px dashed #e0e0e0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        .error-message {
+            color: #dc3545;
+            background-color: #ffebe6;
+            border-color: #ffcccb;
+            font-weight: bold;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Footer (consistent with index.html) */
+        footer {
+            background: linear-gradient(135deg, #006064, #004d40); /* Slightly darker, richer green gradient */
+            color: #fff;
+            padding: 25px;
+            font-size: 15px;
+            text-align: center;
+            margin-top: 60px; /* Spacing from main content */
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 0;
+            font-size: 14px;
+            color: #e0e0e0;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 992px) {
+            main {
+                max-width: 90%;
+                padding: 30px;
+            }
+            header h1 {
+                font-size: 2.8em;
+            }
+            main h2 {
+                font-size: 2.4em;
+            }
+            .cart-item img {
+                width: 90px;
+                height: 90px;
+            }
+            .cart-item-details h3 {
+                font-size: 1.3em;
+            }
+            .cart-item-price {
+                font-size: 1.2em;
+            }
+            #checkout-btn, #clear-cart-btn {
+                font-size: 1.3em;
+                padding: 16px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            header {
+                padding: 2em 0;
+            }
+            header h1 {
+                font-size: 2.4em;
+            }
+            #back-to-products {
+                position: static; /* Remove absolute positioning */
+                margin-top: 15px; /* Add some margin */
+                display: block; /* Make it block to center better */
+                width: fit-content;
+                margin-left: auto;
+                margin-right: auto;
+            }
+            main {
+                padding: 25px;
+                margin: 30px auto;
+            }
+            main h2 {
+                font-size: 2em;
+                margin-bottom: 25px;
+            }
+            .cart-item {
+                flex-wrap: wrap; /* Allow items to wrap */
+                justify-content: center;
+                text-align: center;
+            }
+            .cart-item img {
+                margin-right: 0;
+                margin-bottom: 15px;
+            }
+            .cart-item-details {
+                text-align: center;
+                flex-basis: 100%; /* Take full width */
+                margin-bottom: 15px;
+            }
+            .cart-item-price {
+                margin-left: 0;
+                width: auto; /* Auto width */
+                flex-basis: 100%;
+                text-align: center;
+                margin-bottom: 15px;
+            }
+            .remove-item-btn {
+                margin-left: 0;
+                flex-basis: 100%;
+            }
+            .cart-item-quantity-controls {
+                justify-content: center;
+            }
+            #cart-total {
+                font-size: 1.6em;
+                margin-top: 25px;
+                padding-top: 18px;
+            }
+            #checkout-btn, #clear-cart-btn {
+                font-size: 1.2em;
+                padding: 14px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            main {
+                padding: 15px;
+            }
+            header h1 {
+                font-size: 2em;
+            }
+            main h2 {
+                font-size: 1.8em;
+            }
+            .cart-item img {
+                width: 80px;
+                height: 80px;
+            }
+            .cart-item-details h3 {
+                font-size: 1.1em;
+            }
+            .cart-item-details p, .cart-item-quantity-controls span {
+                font-size: 0.95em;
+            }
+            .cart-item-price {
+                font-size: 1.1em;
+            }
+            .cart-item-quantity-controls button {
+                padding: 6px 10px;
+                font-size: 1em;
+            }
+            .remove-item-btn {
+                padding: 8px 10px;
+                font-size: 0.85em;
+            }
+            #checkout-btn, #clear-cart-btn {
+                font-size: 1.1em;
+                padding: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Your Shopping Cart</h1>
+        <a href="index.html" id="back-to-products"><i class="fas fa-arrow-left"></i> Continue Shopping</a>
+    </header>
+    <main>
+        <h2>Your Cart Items</h2>
+        <div id="cart-items-container">
+            <p class="loading-message"><i class="fas fa-spinner fa-spin"></i> Loading cart...</p>
+        </div>
+        <div id="cart-total">
+            Total: ₹<span id="cart-total-amount">0.00</span>
+        </div>
+        <button id="checkout-btn"><i class="fas fa-shopping-bag"></i> Proceed to Checkout</button>
+        <button id="clear-cart-btn"><i class="fas fa-trash-alt"></i> Clear Cart</button>
+    </main>
+    <footer>
+        <div class="footer-bottom">
+            &copy; 2025 <strong>Milker</strong>. All rights reserved. Freshness delivered daily.
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const cartItemsContainer = document.getElementById('cart-items-container');
+            const cartTotalAmountSpan = document.getElementById('cart-total-amount');
+            const clearCartBtn = document.getElementById('clear-cart-btn');
+            const checkoutBtn = document.getElementById('checkout-btn');
+
+            const BASE_API_URL = 'http://localhost:8080/api';
+            const CART_API_URL = `${BASE_API_URL}/cart`;
+            const CSRF_TOKEN_API_URL = `${BASE_API_URL}/csrf-token`;
+
+            let csrfToken = null;
+
+            // --- CSRF Token Management ---
+            async function fetchAndSetCsrfToken() {
+                try {
+                    console.log('Fetching CSRF token from:', CSRF_TOKEN_API_URL);
+                    const response = await fetch(CSRF_TOKEN_API_URL);
+                    if (!response.ok) {
+                        throw new Error(`Failed to fetch CSRF token: ${response.status} - ${response.statusText}`);
+                    }
+                    csrfToken = await response.text();
+                    console.log('CSRF token fetched:', csrfToken);
+                } catch (error) {
+                    console.error('Error fetching CSRF token:', error);
+                    alert(`Failed to load cart: Could not fetch CSRF token. Error: ${error.message}`);
+                }
+            }
+
+            async function authenticatedFetch(url, options = {}) {
+                if (['POST', 'PUT', 'DELETE'].includes(options.method)) {
+                    if (!csrfToken) {
+                        await fetchAndSetCsrfToken();
+                        if (!csrfToken) {
+                            throw new Error('CSRF token not available for authenticated request.');
+                        }
+                    }
+                    options.headers = {
+                        ...options.headers,
+                        'X-XSRF-TOKEN': csrfToken
+                    };
+                }
+
+                if (options.body && !options.headers['Content-Type']) {
+                    options.headers['Content-Type'] = 'application/json';
+                }
+
+                const response = await fetch(url, options);
+
+                if (response.status === 403) {
+                    const errorText = await response.text();
+                    console.error('Fetch 403 Error:', errorText);
+                    throw new Error(`Permission Denied (403). Possible CSRF issue or unauthenticated access. Server response: ${errorText.substring(0, Math.min(errorText.length, 200))}...`);
+                }
+
+                return response;
+            }
+
+            // --- Cart Management Functions (Interacting with Backend) ---
+
+            async function fetchCart() {
+                try {
+                    cartItemsContainer.innerHTML = '<p class="loading-message"><i class="fas fa-spinner fa-spin"></i> Loading cart...</p>';
+                    const response = await authenticatedFetch(CART_API_URL);
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status} - ${response.statusText}`);
+                    }
+                    const cartItems = await response.json();
+                    displayCart(cartItems);
+                }
+                catch (error) {
+                    console.error('Error fetching cart:', error);
+                    cartItemsContainer.innerHTML = `<p class="error-message"><i class="fas fa-exclamation-triangle"></i> Failed to load cart items. Error: ${error.message}</p>`;
+                    cartTotalAmountSpan.textContent = '0.00';
+                }
+            }
+
+            function displayCart(cartItems) {
+                cartItemsContainer.innerHTML = '';
+                let totalAmount = 0;
+
+                if (cartItems.length === 0) {
+                    cartItemsContainer.innerHTML = '<p class="empty-cart-message"><i class="fas fa-shopping-cart"></i> Your cart is empty. Add some fresh milk!</p>';
+                    checkoutBtn.disabled = true;
+                    clearCartBtn.disabled = true; // Disable clear cart too
+                } else {
+                    cartItems.forEach(item => {
+                        const itemTotal = item.price * item.quantity;
+                        totalAmount += itemTotal;
+
+                        const cartItemDiv = document.createElement('div');
+                        cartItemDiv.classList.add('cart-item');
+                        cartItemDiv.innerHTML = `
+                            <img src="${item.image}" alt="${item.name}">
+                            <div class="cart-item-details">
+                                <h3>${item.name}</h3>
+                                <p>Price: ₹${item.price.toFixed(2)}</p>
+                                <div class="cart-item-quantity-controls">
+                                    <button class="quantity-decrease" data-cart-item-id="${item.id}">-</button>
+                                    <span>${item.quantity}</span>
+                                    <button class="quantity-increase" data-cart-item-id="${item.id}">+</button>
+                                </div>
+                            </div>
+                            <span class="cart-item-price">₹${itemTotal.toFixed(2)}</span>
+                            <button class="remove-item-btn" data-cart-item-id="${item.id}"><i class="fas fa-times"></i> Remove</button>
+                        `;
+                        cartItemsContainer.appendChild(cartItemDiv);
+                    });
+                    checkoutBtn.disabled = false;
+                    clearCartBtn.disabled = false;
+                }
+                cartTotalAmountSpan.textContent = totalAmount.toFixed(2);
+
+                cartItemsContainer.querySelectorAll('.quantity-decrease').forEach(button => {
+                    button.addEventListener('click', (event) => {
+                        const cartItemId = parseInt(event.target.dataset.cartItemId);
+                        const currentQuantitySpan = event.target.nextElementSibling;
+                        let currentQuantity = parseInt(currentQuantitySpan.textContent);
+                        updateCartItemQuantity(cartItemId, currentQuantity - 1);
+                    });
+                });
+
+                cartItemsContainer.querySelectorAll('.quantity-increase').forEach(button => {
+                    button.addEventListener('click', (event) => {
+                        const cartItemId = parseInt(event.target.dataset.cartItemId);
+                        const currentQuantitySpan = event.target.previousElementSibling;
+                        let currentQuantity = parseInt(currentQuantitySpan.textContent);
+                        updateCartItemQuantity(cartItemId, currentQuantity + 1);
+                    });
+                });
+
+                cartItemsContainer.querySelectorAll('.remove-item-btn').forEach(button => {
+                    button.addEventListener('click', (event) => {
+                        const cartItemId = parseInt(event.target.dataset.cartItemId);
+                        removeCartItem(cartItemId);
+                    });
+                });
+            }
+
+            async function updateCartItemQuantity(cartItemId, newQuantity) {
+                if (newQuantity <= 0) {
+                    await removeCartItem(cartItemId);
+                    return;
+                }
+                try {
+                    const response = await authenticatedFetch(`${CART_API_URL}/${cartItemId}`, {
+                        method: 'PUT',
+                        body: JSON.stringify({ newQuantity: newQuantity })
+                    });
+
+                    if (!response.ok) {
+                        const errorData = await response.json().catch(() => ({ message: 'Unknown error' }));
+                        throw new Error(`Failed to update quantity: ${response.statusText} - ${errorData.message}`);
+                    }
+
+                    await fetchCart();
+                } catch (error) {
+                    console.error('Error updating cart item quantity:', error);
+                    alert(`Error updating quantity: ${error.message}`);
+                }
+            }
+
+            async function removeCartItem(cartItemId) {
+                if (!confirm('Are you sure you want to remove this item?')) {
+                    return;
+                }
+                try {
+                    const response = await authenticatedFetch(`${CART_API_URL}/${cartItemId}`, {
+                        method: 'DELETE'
+                    });
+
+                    if (!response.ok) {
+                        const errorData = await response.json().catch(() => ({ message: 'Unknown error' }));
+                        throw new Error(`Failed to remove item: ${response.statusText} - ${errorData.message}`);
+                    }
+
+                    await fetchCart();
+                    // alert('Item removed from cart!'); // Removed redundant alert
+                } catch (error) {
+                    console.error('Error removing cart item:', error);
+                    alert(`Error removing item: ${error.message}`);
+                }
+            }
+
+            async function clearCart() {
+                if (!confirm('Are you sure you want to clear your entire cart?')) {
+                    return;
+                }
+                try {
+                    const response = await authenticatedFetch(`${CART_API_URL}/clear`, {
+                        method: 'DELETE'
+                    });
+
+                    if (!response.ok) {
+                        const errorData = await response.json().catch(() => ({ message: 'Unknown error' }));
+                        throw new Error(`Failed to clear cart: ${response.statusText} - ${errorData.message}`);
+                    }
+
+                    await fetchCart();
+                    alert('Cart cleared successfully!');
+                } catch (error) {
+                    console.error('Error clearing cart:', error);
+                    alert(`Error clearing cart: ${error.message}`);
+                }
+            }
+
+            // --- Event Listeners for UI ---
+            clearCartBtn.addEventListener('click', clearCart);
+
+            checkoutBtn.addEventListener('click', () => {
+                if (!checkoutBtn.disabled) { // Only proceed if not disabled
+                    window.location.href = 'checkout.html';
+                }
+            });
+
+            // --- Initial Page Load ---
+            fetchAndSetCsrfToken().then(() => {
+                fetchCart(); // Fetch and display cart items when the page loads
+            });
+        });
+    </script>
+</body>
+</html>

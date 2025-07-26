@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Milker - Customer Reviews & Comments</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <style>
+        /* General Reset & Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Open Sans', sans-serif;
+            background-color: #f0f8f8; /* Consistent light background */
+            margin: 0;
+            padding: 0; /* Remove top/bottom padding here, add to sections */
+            color: #333;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        h1, h2, h3 {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            color: #2c3e50; /* Darker, sophisticated blue-gray for headlines */
+        }
+
+        /* Topbar - Reusing the style from index.html */
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #ffffff;
+            padding: 18px 40px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            flex-wrap: wrap;
+        }
+
+        .logo {
+            font-size: 30px;
+            color: #008C8C;
+            text-decoration: none;
+            padding: 8px 15px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            display: inline-block;
+            font-weight: 700;
+            letter-spacing: -0.8px;
+            background-color: transparent;
+            border: 2px solid transparent;
+        }
+
+        .logo:hover {
+            background-color: #e0f2f7;
+            color: #005f5f;
+            border-color: #008C8C;
+            transform: translateY(-2px);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .auth-controls {
+            display: flex;
+            align-items: center;
+            gap: 15px; /* Spacing between auth links/info */
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .auth-controls a, #userInfo {
+            text-decoration: none;
+            color: #5a7d8e; /* Softer, muted blue-gray for links */
+            font-weight: 500;
+            font-size: 17px;
+            position: relative;
+            padding-bottom: 5px;
+            transition: color 0.3s ease;
+        }
+
+        .auth-controls a::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: 0;
+            left: 0;
+            background-color: #008C8C;
+            transition: width 0.3s ease;
+        }
+
+        .auth-controls a:hover::after {
+            width: 100%;
+        }
+
+        .auth-controls a:hover {
+            color: #008C8C;
+        }
+
+        #loginLink, #logoutLink {
+            padding: 10px 18px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        #loginLink {
+            background-color: #ff7043; /* Vibrant orange-red */
+            color: white;
+        }
+
+        #loginLink:hover {
+            background-color: #e6522c;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        #logoutLink {
+            background-color: #dc3545; /* Consistent red */
+            color: white;
+        }
+
+        #logoutLink:hover {
+            background-color: #c82333;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        /* Page specific styles */
+        .page-content-wrapper {
+            max-width: 900px; /* Slightly wider content area */
+            margin: 40px auto; /* Centered with spacing */
+            padding: 0 20px; /* Padding for small screens */
+        }
+
+        h1 {
+            text-align: center;
+            color: #008C8C; /* Brand primary color */
+            font-size: 3.2em; /* Larger heading */
+            margin-bottom: 30px;
+            position: relative;
+            padding-bottom: 10px;
+        }
+
+        h1::after {
+            content: '';
+            position: absolute;
+            width: 100px;
+            height: 4px;
+            background-color: #ff7043; /* Accent color underline */
+            left: 50%;
+            transform: translateX(-50%);
+            bottom: 0;
+            border-radius: 2px;
+        }
+
+
+        form {
+            background-color: #ffffff;
+            max-width: 700px; /* Wider form */
+            margin: 0 auto 40px auto;
+            padding: 30px 40px; /* More padding */
+            border-radius: 15px; /* More rounded */
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1); /* Deeper shadow */
+            border: 1px solid #e0e0e0;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #444;
+            font-size: 1.05em;
+        }
+
+        input[type="text"], textarea {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            border: 1px solid #d0d0d0; /* Softer border */
+            border-radius: 8px; /* More rounded */
+            font-size: 1.05em;
+            transition: all 0.3s ease;
+            outline: none;
+            box-sizing: border-box; /* Ensures padding is included in width */
+        }
+
+        input[type="text"]:focus, textarea:focus {
+            border-color: #008C8C;
+            box-shadow: 0 0 0 3px rgba(0, 140, 140, 0.2); /* Soft glow */
+        }
+
+        input[type="text"][readonly] {
+            background-color: #e9ecef;
+            cursor: not-allowed;
+            color: #666;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 120px; /* Taller textarea */
+        }
+
+        button[type="submit"] {
+            padding: 14px 30px; /* More padding */
+            background-color: #008C8C; /* Brand primary color */
+            color: white;
+            border: none;
+            border-radius: 8px; /* More rounded */
+            cursor: pointer;
+            font-size: 1.1em; /* Larger font */
+            font-weight: 600;
+            transition: background-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            display: block; /* Make it block to take full width if desired, or inline-block to float */
+            width: fit-content; /* Adjust button width to content */
+            margin-left: auto; /* Center button */
+            margin-right: auto; /* Center button */
+        }
+
+        button[type="submit"]:hover {
+            background-color: #005f5f;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px rgba(0,0,0,0.18);
+        }
+
+        button[type="submit"]:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+            box-shadow: none;
+            transform: none;
+        }
+
+
+        h2 {
+            text-align: center;
+            color: #2c3e50; /* Darker tone for section heading */
+            font-size: 2.5em;
+            margin-top: 50px; /* More space above comments section */
+            margin-bottom: 30px;
+            position: relative;
+            padding-bottom: 10px;
+        }
+
+        h2::after {
+            content: '';
+            position: absolute;
+            width: 80px;
+            height: 3px;
+            background-color: #008C8C; /* Brand color underline */
+            left: 50%;
+            transform: translateX(-50%);
+            bottom: 0;
+            border-radius: 2px;
+        }
+
+        #commentsContainer {
+            max-width: 700px; /* Consistent with form width */
+            margin: 0 auto;
+            padding-bottom: 50px; /* Space at the bottom */
+        }
+
+        .comment {
+            background-color: #ffffff;
+            padding: 25px 30px; /* More padding */
+            margin-bottom: 20px; /* More space between comments */
+            border-left: 6px solid #4CAF50; /* Fresh green accent for comments */
+            border-radius: 10px; /* Softer rounding */
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08); /* Deeper shadow */
+            animation: fadeIn 0.5s ease-in-out;
+            transition: transform 0.2s ease;
+        }
+
+        .comment:hover {
+            transform: translateY(-3px); /* Subtle lift on hover */
+        }
+
+        .comment strong {
+            color: #00758f; /* Darker teal for name */
+            font-size: 1.3em; /* Larger name */
+            margin-bottom: 8px;
+            display: block; /* Make name a block for better spacing */
+            font-weight: 700;
+        }
+
+        .comment p {
+            color: #555;
+            font-size: 1.05em;
+            line-height: 1.7;
+        }
+
+        #loading, .empty-message, .error-message {
+            text-align: center;
+            font-style: italic;
+            color: #666;
+            margin-top: 20px;
+            padding: 20px;
+            border-radius: 8px;
+            background-color: #f7f7f7;
+            border: 1px solid #eee;
+        }
+        #loading i {
+            margin-right: 8px;
+            color: #008C8C;
+        }
+        .error-message {
+            color: #dc3545; /* Red for errors */
+            font-weight: bold;
+            background-color: #ffebe6;
+            border-color: #ffcccb;
+        }
+        .error-message i {
+            margin-right: 8px;
+            color: #dc3545;
+        }
+        .empty-message {
+            color: #888;
+            background-color: #fcfcfc;
+            border-color: #ddd;
+        }
+        .empty-message i {
+            margin-right: 8px;
+            color: #888;
+        }
+
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Footer (consistent with index.html) */
+        footer {
+            background: linear-gradient(135deg, #006064, #004d40);
+            color: #fff;
+            padding: 25px;
+            font-size: 15px;
+            text-align: center;
+            margin-top: 60px; /* More spacing from comments */
+        }
+
+        .footer-bottom {
+            font-size: 14px;
+            color: #e0e0e0;
+        }
+
+
+        /* Responsive Design */
+        @media (max-width: 992px) {
+            .topbar {
+                padding: 15px 30px;
+            }
+            .page-content-wrapper {
+                max-width: 90%;
+            }
+            h1 {
+                font-size: 2.8em;
+            }
+            h2 {
+                font-size: 2.2em;
+            }
+            form, #commentsContainer {
+                padding: 25px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .topbar {
+                flex-direction: column;
+                gap: 15px;
+                padding: 20px;
+                text-align: center;
+            }
+            .auth-controls {
+                flex-direction: column;
+                gap: 10px;
+                width: 100%;
+            }
+            #loginLink, #logoutLink {
+                width: 100%;
+                justify-content: center;
+            }
+            .logo {
+                margin-bottom: 10px;
+            }
+            .page-content-wrapper {
+                margin: 30px auto;
+                padding: 0 15px;
+            }
+            h1 {
+                font-size: 2.4em;
+                margin-bottom: 25px;
+            }
+            h2 {
+                font-size: 1.8em;
+                margin-top: 40px;
+                margin-bottom: 25px;
+            }
+            form {
+                padding: 20px;
+            }
+            .comment {
+                padding: 20px 25px;
+            }
+            .comment strong {
+                font-size: 1.2em;
+            }
+            .comment p {
+                font-size: 1em;
+            }
+            button[type="submit"] {
+                width: 100%;
+                font-size: 1em;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .topbar {
+                padding: 15px;
+            }
+            h1 {
+                font-size: 2em;
+            }
+            h2 {
+                font-size: 1.6em;
+            }
+            form {
+                padding: 15px;
+            }
+            input[type="text"], textarea {
+                font-size: 0.95em;
+                padding: 10px;
+            }
+            .comment {
+                padding: 15px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="topbar">
+        <a href="/" class="logo">Milker</a>
+        <div class="auth-controls">
+            <div id="userInfo"></div>
+            <a href="/oauth2/authorization/google" id="loginLink" style="display:none;">
+                <i class="fab fa-google"></i> Login
+            </a>
+            <a href="/logout" id="logoutLink" style="display:none;">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </a>
+        </div>
+    </header>
+
+    <div class="page-content-wrapper">
+        <h1>Share Your Thoughts</h1>
+
+        <form id="commentForm">
+            <label for="name">Your Name:</label>
+            <input type="text" id="name" placeholder="Your name" required>
+
+            <label for="comment">Your Comment:</label>
+            <textarea id="comment" rows="4" placeholder="Type your comment here..." required></textarea>
+
+            <button type="submit">
+                <i class="fas fa-paper-plane"></i> Submit Comment
+            </button>
+        </form>
+
+        <h2>Customer Reviews</h2>
+        <div id="loading"><i class="fas fa-sync fa-spin"></i> Loading comments...</div>
+        <div id="commentsContainer"></div>
+    </div>
+
+    <footer>
+        <div class="footer-bottom">
+            &copy; 2025 <strong>Milker</strong>. All rights reserved. Freshness delivered daily.
+        </div>
+    </footer>
+
+    <script>
+        const form = document.getElementById('commentForm');
+        const commentsContainer = document.getElementById('commentsContainer');
+        const loadingDiv = document.getElementById('loading');
+        const userInfoDiv = document.getElementById('userInfo');
+        const loginLink = document.getElementById('loginLink');
+        const logoutLink = document.getElementById('logoutLink');
+        const nameInput = document.getElementById('name');
+        const submitButton = form.querySelector('button[type="submit"]'); // Get the submit button
+
+        let currentUser = null;
+        let currentCsrfToken = null;
+
+        async function fetchCsrfToken() {
+            try {
+                const response = await fetch('/api/csrf-token');
+                if (response.ok) {
+                    const token = await response.text();
+                    console.log("CSRF Token fetched:", token);
+                    return token;
+                } else {
+                    console.error('Failed to fetch CSRF token from /api/csrf-token:', response.status, response.statusText);
+                    return null;
+                }
+            } catch (error) {
+                console.error('Error fetching CSRF token:', error);
+                return null;
+            }
+        }
+
+        async function isAuthenticated() {
+            try {
+                const response = await fetch('/api/user/current');
+                if (response.ok) {
+                    currentUser = await response.json();
+                    userInfoDiv.innerHTML = `Welcome, <strong>${currentUser.name || currentUser.email || 'User'}</strong>!`;
+                    loginLink.style.display = 'none';
+                    logoutLink.style.display = 'inline-flex'; // Use flex for icon alignment
+
+                    nameInput.value = currentUser.name || currentUser.email || '';
+                    nameInput.readOnly = true;
+                    nameInput.removeAttribute('required'); // Remove required if auto-filled
+                    return true;
+                } else if (response.status === 401) {
+                    currentUser = null;
+                    userInfoDiv.textContent = 'Not logged in.';
+                    loginLink.style.display = 'inline-flex';
+                    logoutLink.style.display = 'none';
+
+                    nameInput.value = '';
+                    nameInput.readOnly = false;
+                    nameInput.setAttribute('required', 'true');
+                    return false;
+                } else {
+                    console.error("Failed to fetch user info. Status:", response.status);
+                    currentUser = null;
+                    userInfoDiv.textContent = 'Not logged in (error).';
+                    loginLink.style.display = 'inline-flex';
+                    logoutLink.style.display = 'none';
+                    nameInput.readOnly = false;
+                    nameInput.setAttribute('required', 'true');
+                    return false;
+                }
+            } catch (error) {
+                console.error("Error checking authentication status:", error);
+                currentUser = null;
+                userInfoDiv.textContent = 'Not logged in (network error).';
+                loginLink.style.display = 'inline-flex';
+                logoutLink.style.display = 'none';
+                nameInput.readOnly = false;
+                nameInput.setAttribute('required', 'true');
+                return false;
+            }
+        }
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const name = currentUser ? (currentUser.name || currentUser.email) : document.getElementById('name').value;
+            const comment = document.getElementById('comment').value;
+
+            if (!comment.trim()) {
+                alert("Comment cannot be empty.");
+                return;
+            }
+            if (!name.trim()) {
+                alert("Name cannot be empty. Please log in or enter a name.");
+                return;
+            }
+
+            if (!currentCsrfToken) {
+                currentCsrfToken = await fetchCsrfToken();
+                if (!currentCsrfToken) {
+                    alert("Error: CSRF token not available. Please try refreshing the page and logging in again.");
+                    return;
+                }
+            }
+
+            const headers = {
+                'Content-Type': 'application/json',
+                'X-XSRF-TOKEN': currentCsrfToken
+            };
+
+            submitButton.disabled = true; // Disable button
+            submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting...'; // Change button text
+
+            try {
+                const response = await fetch('/api/comments', {
+                    method: 'POST',
+                    headers: headers,
+                    body: JSON.stringify({ name, comment })
+                });
+
+                if (response.ok) {
+                    document.getElementById('comment').value = '';
+                    loadComments();
+                } else if (response.status === 403) {
+                    alert("Submission failed: Not authorized or session expired. Please try logging in again.");
+                    console.error('Forbidden error on POST:', await response.text());
+                    await isAuthenticated(); // Re-check auth status
+                } else if (response.status === 401) {
+                     alert("Submission failed: You need to be logged in to post comments. Redirecting to login...");
+                     window.location.href = '/oauth2/authorization/google';
+                }
+                else {
+                    const errorText = await response.text();
+                    alert(`Failed to post comment. Status: ${response.status} ${response.statusText}\nDetails: ${errorText}`);
+                    console.error('Response details:', errorText);
+                }
+            } catch (error) {
+                console.error('Error submitting comment:', error);
+                alert('An error occurred while submitting the comment. Check console for details.');
+            } finally {
+                submitButton.disabled = false; // Re-enable button
+                submitButton.innerHTML = '<i class="fas fa-paper-plane"></i> Submit Comment'; // Reset button text
+            }
+        });
+
+        async function loadComments() {
+            loadingDiv.innerHTML = '<i class="fas fa-sync fa-spin"></i> Loading comments...';
+            loadingDiv.style.display = 'block';
+            commentsContainer.innerHTML = ''; // Clear previous comments
+
+            try {
+                const response = await fetch('/api/comments');
+                if (response.ok) {
+                    const comments = await response.json();
+                    if (comments.length === 0) {
+                        commentsContainer.innerHTML = '<p class="empty-message"><i class="fas fa-comment-dots"></i> No comments yet. Be the first to leave one!</p>';
+                    } else {
+                        comments.forEach(c => {
+                            const div = document.createElement('div');
+                            div.className = 'comment';
+                            div.innerHTML = `<strong>${c.name || 'Anonymous'}</strong><p>${c.comment}</p>`;
+                            commentsContainer.appendChild(div);
+                        });
+                    }
+                } else if (response.status === 401 || response.status === 302) {
+                    commentsContainer.innerHTML = '<p class="empty-message"><i class="fas fa-lock"></i> Please <a href="/oauth2/authorization/google">log in</a> to view comments.</p>';
+                } else {
+                    commentsContainer.innerHTML = '<p class="error-message"><i class="fas fa-exclamation-triangle"></i> Failed to load comments.</p>';
+                    console.error('Failed to load comments. Status:', response.status);
+                }
+            } catch (error) {
+                commentsContainer.innerHTML = '<p class="error-message"><i class="fas fa-exclamation-circle"></i> An error occurred while fetching comments.</p>';
+                console.error('Error loading comments:', error);
+            } finally {
+                loadingDiv.style.display = 'none';
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            await isAuthenticated();
+            currentCsrfToken = await fetchCsrfToken();
+            loadComments();
+        });
+    </script>
+</body>
+</html>

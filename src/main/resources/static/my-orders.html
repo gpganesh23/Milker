@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Orders - Milk Dairy</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #2c3e50; /* Dark blue/grey */
+            --secondary-color: #3498db; /* Blue */
+            --accent-color: #28a745; /* Green for success/price */
+            --light-bg: #f8f8f8;
+            --white: #ffffff;
+            --text-color: #333;
+            --light-text: #555;
+            --border-color: #e0e0e0;
+            --shadow-light: rgba(0, 0, 0, 0.08);
+            --shadow-medium: rgba(0, 0, 0, 0.15);
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif; /* Changed font */
+            margin: 0;
+            padding: 0;
+            background-color: var(--light-bg);
+            color: var(--text-color);
+            line-height: 1.6;
+            overflow-x: hidden; /* Prevent horizontal scroll */
+        }
+
+        header {
+            background-color: var(--primary-color);
+            color: var(--white);
+            padding: 1.8em 0; /* Increased padding */
+            text-align: center;
+            box-shadow: 0 3px 8px var(--shadow-medium); /* Stronger shadow */
+            position: relative;
+            z-index: 1000;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 2.8em; /* Larger font */
+            letter-spacing: 1.5px; /* More spacing */
+            font-weight: 700;
+        }
+
+        #back-to-home {
+            position: absolute;
+            top: 50%;
+            left: 20px;
+            transform: translateY(-50%); /* Vertically center */
+            background-color: var(--white);
+            color: var(--primary-color);
+            padding: 10px 18px; /* Larger padding */
+            border-radius: 25px; /* Pill shape */
+            font-weight: 600;
+            box-shadow: 0 3px 8px var(--shadow-light);
+            font-size: 1.05em;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: flex; /* For alignment of arrow */
+            align-items: center;
+            gap: 5px;
+        }
+        #back-to-home:hover {
+            background-color: var(--secondary-color);
+            color: var(--white);
+            box-shadow: 0 4px 12px var(--shadow-medium);
+        }
+
+        main {
+            padding: 40px 20px; /* Increased padding */
+            max-width: 1100px; /* Wider content area */
+            margin: 40px auto; /* More margin */
+            background-color: var(--white);
+            border-radius: 12px; /* More rounded */
+            box-shadow: 0 8px 25px var(--shadow-medium); /* More prominent shadow */
+        }
+
+        main h2 {
+            text-align: center;
+            color: var(--primary-color);
+            margin-top: 0;
+            margin-bottom: 35px; /* More spacing */
+            font-size: 2.4em; /* Larger */
+            font-weight: 600;
+            position: relative;
+            padding-bottom: 15px;
+        }
+        main h2::after { /* Underline effect */
+            content: '';
+            position: absolute;
+            left: 50%;
+            bottom: 0;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 4px;
+            background-color: var(--secondary-color);
+            border-radius: 2px;
+        }
+
+
+        #orders-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); /* Responsive grid */
+            gap: 25px; /* Increased gap */
+        }
+
+        .order-card {
+            border: 1px solid var(--border-color);
+            border-radius: 10px; /* Consistent rounding */
+            padding: 25px; /* More padding */
+            background-color: var(--white);
+            box-shadow: 0 4px 15px var(--shadow-light); /* Softer initial shadow */
+            transition: all 0.3s ease;
+            overflow: hidden; /* Ensures borders/shadows don't get cut */
+        }
+
+        .order-card:hover {
+            box-shadow: 0 8px 25px var(--shadow-medium); /* More pronounced on hover */
+            transform: translateY(-5px); /* Lift effect */
+        }
+
+        .order-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px; /* More spacing */
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border-color); /* Lighter border */
+        }
+
+        .order-header h3 {
+            margin: 0;
+            font-size: 1.5em; /* Larger */
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+
+        .order-header .order-total {
+            font-size: 1.6em; /* Larger */
+            font-weight: 700;
+            color: var(--accent-color);
+        }
+
+        .order-details p {
+            margin: 8px 0; /* More spacing */
+            font-size: 0.98em; /* Slightly larger */
+            color: var(--light-text);
+        }
+        .order-details strong {
+            color: var(--text-color);
+            font-weight: 600;
+        }
+
+        .order-items-toggle {
+            display: flex; /* For icon alignment */
+            align-items: center;
+            gap: 8px;
+            background: none;
+            border: none;
+            color: var(--secondary-color);
+            cursor: pointer;
+            text-align: left;
+            font-size: 1.05em; /* Slightly larger */
+            font-weight: 600;
+            padding: 12px 0; /* More padding */
+            transition: color 0.3s ease;
+            width: 100%; /* Full width */
+            justify-content: flex-start; /* Align text to left */
+        }
+        .order-items-toggle:hover {
+            color: #0056b3; /* Darker blue on hover */
+        }
+        /* Simple arrow icon for toggle */
+        .order-items-toggle::after {
+            content: '▼'; /* Down arrow */
+            font-size: 0.8em;
+            transition: transform 0.3s ease;
+        }
+        .order-items-toggle.show::after {
+            content: '▲'; /* Up arrow */
+            transform: rotate(0deg); /* No rotation needed if content changes */
+        }
+
+
+        .order-items-list {
+            margin-top: 20px; /* More spacing */
+            border-top: 1px dashed var(--border-color); /* Lighter dashed border */
+            padding-top: 20px;
+            display: none; /* Hidden by default */
+        }
+
+        .order-items-list.show {
+            display: block;
+        }
+
+        .order-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px; /* More spacing */
+            padding: 10px 0;
+            border-bottom: 1px dotted rgba(0,0,0,0.08); /* Softer dotted line */
+            font-size: 0.95em;
+        }
+        .order-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+
+        .order-item-details {
+            flex-grow: 1;
+        }
+        .order-item-details span {
+            font-weight: 500;
+            color: var(--text-color);
+        }
+        .order-item-details small {
+            font-size: 0.85em;
+            color: var(--light-text);
+        }
+
+        .order-item-qty, .order-item-price {
+            font-weight: 600;
+            text-align: right;
+            width: 80px; /* Slightly wider for price/qty */
+            flex-shrink: 0; /* Prevent shrinking */
+        }
+        .order-item-price {
+            color: var(--accent-color);
+        }
+
+        .empty-orders-message, .loading-message, .error-message {
+            text-align: center;
+            font-size: 1.3em; /* Larger */
+            padding: 50px; /* More padding */
+            color: var(--light-text);
+            font-style: italic;
+            background-color: var(--white);
+            border-radius: 10px;
+            box-shadow: 0 4px 10px var(--shadow-light);
+            margin: 20px auto;
+            max-width: 600px;
+        }
+        .error-message {
+            color: #d9534f; /* Red for errors */
+            font-weight: 600;
+            font-style: normal;
+        }
+
+        footer {
+            text-align: center;
+            padding: 30px; /* More padding */
+            background-color: var(--primary-color);
+            color: var(--white);
+            margin-top: 50px; /* More margin */
+            font-size: 0.9em;
+            box-shadow: 0 -2px 8px var(--shadow-medium); /* Shadow on top */
+        }
+
+        /* --- Responsive Design --- */
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 2em;
+            }
+            #back-to-home {
+                position: static;
+                transform: none;
+                margin: 15px auto 0;
+                display: table; /* To center it horizontally */
+                padding: 8px 15px;
+                font-size: 0.95em;
+            }
+            main {
+                margin: 20px auto;
+                padding: 25px 15px;
+            }
+            main h2 {
+                font-size: 1.8em;
+                margin-bottom: 25px;
+            }
+            .order-card {
+                padding: 20px;
+            }
+            .order-header {
+                flex-direction: column;
+                align-items: flex-start;
+                margin-bottom: 15px;
+                padding-bottom: 10px;
+            }
+            .order-header h3 {
+                font-size: 1.3em;
+                margin-bottom: 5px;
+            }
+            .order-header .order-total {
+                font-size: 1.4em;
+            }
+            .order-details p {
+                font-size: 0.9em;
+            }
+            .order-items-toggle {
+                font-size: 0.95em;
+                padding: 10px 0;
+            }
+            .order-item {
+                font-size: 0.85em;
+            }
+            .order-item-qty, .order-item-price {
+                width: 60px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            header h1 {
+                font-size: 1.8em;
+            }
+            #back-to-home {
+                font-size: 0.9em;
+                padding: 7px 12px;
+            }
+            main {
+                padding: 20px 10px;
+            }
+            main h2 {
+                font-size: 1.6em;
+            }
+            .order-card {
+                padding: 15px;
+            }
+            .order-header h3 {
+                font-size: 1.2em;
+            }
+            .order-total {
+                font-size: 1.3em;
+            }
+            .empty-orders-message, .loading-message, .error-message {
+                font-size: 1em;
+                padding: 30px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>My Orders</h1>
+        <a href="index.html" id="back-to-home">&larr; Back to Home</a>
+    </header>
+
+    <main>
+        <h2>Your Past Orders</h2>
+        <div id="orders-container">
+            <p class="loading-message">Loading your orders...</p>
+        </div>
+    </main>
+    <footer>
+           <div class="footer-bottom">
+            © 2025 <strong>Milker</strong>. All rights reserved. Freshness delivered daily.
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const ordersContainer = document.getElementById('orders-container');
+
+            const BASE_API_URL = 'http://localhost:8080/api'; 
+            const ORDERS_API_URL = `${BASE_API_URL}/checkout/orders`; // This is the new endpoint
+            const CSRF_TOKEN_API_URL = `${BASE_API_URL}/csrf-token`;
+
+            let csrfToken = null;
+
+            // --- CSRF Token Management (Copied from previous files) ---
+            async function fetchAndSetCsrfToken() {
+                try {
+                    console.log('Fetching CSRF token from:', CSRF_TOKEN_API_URL);
+                    const response = await fetch(CSRF_TOKEN_API_URL);
+                    if (!response.ok) {
+                        // Handle cases where CSRF endpoint might not be available or fails
+                        if (response.status === 404) {
+                             console.warn('CSRF token endpoint not found. Proceeding without CSRF token (ensure your security configuration allows this for GET, or handle appropriately).');
+                             csrfToken = null; // Explicitly set to null if not found
+                             return;
+                        }
+                        throw new Error(`Failed to fetch CSRF token: ${response.status} - ${response.statusText}`);
+                    }
+                    csrfToken = await response.text();
+                    console.log('CSRF token fetched:', csrfToken);
+                } catch (error) {
+                    console.error('Error fetching CSRF token:', error);
+                    // Do not display error to user immediately for CSRF failure,
+                    // as it might be a POST/PUT/DELETE issue. Let authenticatedFetch handle it.
+                }
+            }
+
+            async function authenticatedFetch(url, options = {}) {
+                if (['POST', 'PUT', 'DELETE'].includes(options.method)) {
+                    // Only fetch CSRF token if it's a modifying request and token is not yet available
+                    if (!csrfToken) {
+                        await fetchAndSetCsrfToken(); 
+                        if (!csrfToken) {
+                            // If token is still null after attempting to fetch, it's an issue
+                            throw new Error('CSRF token not available for authenticated request. Cannot proceed with modifying operation.');
+                        }
+                    }
+                    options.headers = {
+                        ...options.headers,
+                        'X-XSRF-TOKEN': csrfToken
+                    };
+                }
+
+                // Ensure Content-Type is set for JSON bodies
+                if (options.body && typeof options.body === 'object' && !options.headers['Content-Type']) {
+                    options.headers['Content-Type'] = 'application/json';
+                    options.body = JSON.stringify(options.body); // Stringify JSON body
+                } else if (options.body && typeof options.body === 'string' && !options.headers['Content-Type']) {
+                     // If body is already a string, assume it's meant to be plain text or already stringified JSON
+                     // No default Content-Type set here to allow flexibility, unless specifically json
+                }
+
+
+                const response = await fetch(url, options);
+
+                if (response.status === 403) {
+                    const errorText = await response.text();
+                    console.error('Fetch 403 Error:', errorText);
+                    alert(`Access Denied (403). It seems your session has expired or you do not have permission. Please log in again.`);
+                    // Redirect to login page only if necessary and if one exists
+                    // window.location.href = 'login.html'; 
+                    throw new Error(`Access Denied (403).`);
+                }
+                
+                return response;
+            }
+
+            // --- Fetch and Display Orders ---
+            async function fetchOrdersAndDisplay() {
+                try {
+                    ordersContainer.innerHTML = '<p class="loading-message">Loading your orders...</p>';
+                    const response = await authenticatedFetch(ORDERS_API_URL);
+                    
+                    if (!response.ok) {
+                        if (response.status === 204 || response.status === 404) { // No Content or Not Found (if API returns 404 for empty list)
+                            ordersContainer.innerHTML = '<p class="empty-orders-message">You have not placed any orders yet. Start shopping now!</p>';
+                            return;
+                        }
+                        throw new Error(`HTTP error! status: ${response.status} - ${response.statusText}`);
+                    }
+                    
+                    const orders = await response.json();
+                    displayOrders(orders);
+
+                } catch (error) {
+                    console.error('Error fetching orders:', error);
+                    ordersContainer.innerHTML = `<p class="error-message">Failed to load your orders. Please try again later. Error: ${error.message}</p>`;
+                }
+            }
+
+            function displayOrders(orders) {
+                ordersContainer.innerHTML = ''; // Clear loading message
+
+                if (orders.length === 0) {
+                    ordersContainer.innerHTML = '<p class="empty-orders-message">You have not placed any orders yet. Start shopping now!</p>';
+                    return;
+                }
+
+                orders.forEach(order => {
+                    const orderCard = document.createElement('div');
+                    orderCard.classList.add('order-card');
+                    
+                    // Format date
+                    const orderDate = new Date(order.dateCreated).toLocaleString('en-IN', { 
+                        year: 'numeric', month: 'short', day: 'numeric', 
+                        hour: '2-digit', minute: '2-digit', second: '2-digit' 
+                    });
+
+                    // Build order items list
+                    let orderItemsHtml = '';
+                    if (order.orderItems && order.orderItems.length > 0) {
+                        order.orderItems.forEach(item => {
+                            orderItemsHtml += `
+                                <div class="order-item">
+                                    <div class="order-item-details">
+                                        <span>${item.productName || 'N/A'}</span>
+                                        <small>Product ID: ${item.productId || 'N/A'}</small>
+                                    </div>
+                                    <span class="order-item-qty">x${item.quantity}</span>
+                                    <span class="order-item-price">₹${item.unitPrice ? (item.unitPrice * item.quantity).toFixed(2) : '0.00'}</span>
+                                </div>
+                            `;
+                        });
+                    } else {
+                        orderItemsHtml = '<p class="no-items-in-order">No items found for this order.</p>'; // Added a class for styling
+                    }
+
+                    orderCard.innerHTML = `
+                        <div class="order-header">
+                            <h3>Order ID: #${order.orderTrackingNumber ? order.orderTrackingNumber.substring(0, 8) : 'N/A'}...</h3>
+                            <span class="order-total">₹${order.totalAmount ? order.totalAmount.toFixed(2) : '0.00'}</span>
+                        </div>
+                        <div class="order-details">
+                            <p><strong>Order Date:</strong> ${orderDate}</p>
+                            <p><strong>Mobile No:</strong> ${order.customerMobileNo || 'N/A'}</p>
+                            <p><strong>Delivery To:</strong> ${order.deliveryAddressLine1 || 'N/A'}${order.deliveryAddressLine2 ? ', ' + order.deliveryAddressLine2 : ''}, ${order.deliveryCity || 'N/A'}, ${order.deliveryState || 'N/A'} - ${order.deliveryPincode || 'N/A'}</p>
+                        </div>
+                        <button class="order-items-toggle" data-order-id="${order.id}">
+                            View Order Items (${order.orderItems ? order.orderItems.length : 0})
+                        </button>
+                        <div class="order-items-list" id="order-items-${order.id}">
+                            ${orderItemsHtml}
+                        </div>
+                    `;
+                    ordersContainer.appendChild(orderCard);
+                });
+
+                // Add event listeners for toggling order items
+                ordersContainer.querySelectorAll('.order-items-toggle').forEach(button => {
+                    button.addEventListener('click', (event) => {
+                        const orderId = event.target.dataset.orderId;
+                        const itemsList = document.getElementById(`order-items-${orderId}`);
+                        if (itemsList) {
+                            itemsList.classList.toggle('show');
+                            event.target.classList.toggle('show'); // Toggle class on button for arrow change
+                            event.target.textContent = itemsList.classList.contains('show') ?
+                                `Hide Order Items (${orders.find(o => o.id == orderId)?.orderItems?.length || 0})` :
+                                `View Order Items (${orders.find(o => o.id == orderId)?.orderItems?.length || 0})`;
+                        }
+                    });
+                });
+            }
+
+            // --- Initial Page Load ---
+            // Fetch CSRF token first, then proceed to fetch and display orders.
+            // This ensures CSRF token is available for future POST/PUT/DELETE requests if any,
+            // though fetching orders is typically a GET request.
+            fetchAndSetCsrfToken().then(() => {
+                fetchOrdersAndDisplay();
+            });
+        });
+    </script>
+</body>
+</html>
