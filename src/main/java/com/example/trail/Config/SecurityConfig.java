@@ -7,10 +7,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
-// No need for AuthenticationSuccessHandler or SimpleUrlAuthenticationSuccessHandler imports if using defaultSuccessUrl
-import static org.springframework.security.config.Customizer.withDefaults;
-
-import com.example.trail.Service.CustomOAuth2UserService; // Assuming this path is correct
+import com.example.trail.Service.CustomOAuth2UserService;
 
 @Configuration
 @EnableWebSecurity
@@ -27,56 +24,38 @@ public class SecurityConfig {
         http
             .csrf(csrf -> csrf
                 .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
-                // You can add paths to ignore CSRF if needed, e.g., for specific public POSTs
-                // .ignoringRequestMatchers("/some/public/post/endpoint")
             )
-           
-                .authorizeHttpRequests(authorize -> authorize
-                	    .requestMatchers(
-                	        "/", "/index.html", "/reviews.html",
-                	        "/css/**", "/js/**", "/img/**",
-                	        "/error",
-                	        "/api/csrf-token" // <--- ADD THIS LINE
-                	    ).permitAll()
-                	    // ... rest of your configuration
-                	
+            .authorizeHttpRequests(authorize -> authorize
+                .requestMatchers(
+                    "/", "/index.html", "/reviews.html", "/cart.html", // <-- ADDED /cart.html
+                    "/css/**", "/js/**", "/img/**",
+                    "/error",
+                    "/api/csrf-token"
+                ).permitAll()
 
-                // Allow GET requests to /api/comments for anyone to view comments
+                // --- ADD THESE LINES FOR PRODUCT API ACCESS ---
+                // Assuming your product API is at /api/products or /products
+                // If products should be visible to *everyone* (unauthenticated users):
+                .requestMatchers(HttpMethod.GET, "/api/products/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/products/**").permitAll() // If you have a top-level /products endpoint
+
+                // Existing rules:
                 .requestMatchers(HttpMethod.GET, "/api/comments").permitAll()
-
-                // Allow /api/user/current (or /api/comments/user/current if you stick to that path)
-                // to check authentication status without forcing a redirect for unauthenticated users.
-                // This is crucial for your frontend's isAuthenticated() function.
-                // NOTE: If you changed UserController to /api/user/current, ensure that path is here.
-                .requestMatchers("/api/user/current").permitAll() // Assuming you fixed UserController to /api/user/current
-                .requestMatchers("/api/checkout/placeOrder").permitAll()
-                // All other requests (e.g., POST /api/comments) require authentication.
+                .requestMatchers("/api/user/current").permitAll()
+                .requestMatchers("/api/checkout/placeOrder").permitAll() // Consider if this should be authenticated
                 .anyRequest().authenticated()
             )
             .oauth2Login(oauth2Login -> oauth2Login
                 .userInfoEndpoint(userInfo -> userInfo
-                    .userService(customOAuth2UserService) // Use your custom user service
+                    .userService(customOAuth2UserService)
                 )
-                // --- CRITICAL CHANGE HERE ---
-                // Redirect to the root ("/") after successful OAuth2 login.
-                // The 'true' argument ensures it's always a redirect, even if the user was originally
-                // trying to access a protected page. This helps ensure CSRF token is set.
-                .defaultSuccessUrl("/", true) // <--- CHANGED THIS LINE
-                // You can specify "/reviews.html" if you want to go directly there after login
-                // .defaultSuccessUrl("/reviews.html", true)
+                .defaultSuccessUrl("/", true)
             )
-            // Removed .formLogin(withDefaults()); as it's typically not needed with OAuth2Login
-            // unless you also support traditional form-based login.
             .logout(logout -> logout
-                .logoutSuccessUrl("/index.html") // Redirect to index after logout
-                .permitAll() // Ensure logout endpoint is accessible
+                .logoutSuccessUrl("/index.html")
+                .permitAll()
             );
 
         return http.build();
     }
-
-    // --- REMOVED THIS BEAN ---
-    // public AuthenticationSuccessHandler oauth2AuthenticationSuccessHandler() {
-    //     return new SimpleUrlAuthenticationSuccessHandler("/");
-    // }
 }
