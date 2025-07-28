@@ -453,7 +453,11 @@
             const deliveryForm = document.getElementById('delivery-form');
             const placeOrderBtn = document.getElementById('place-order-btn');
 
-            const BASE_API_URL = 'http://localhost:8080/api';
+            // CHOOSE ONE OF THE FOLLOWING FOR BASE_API_URL:
+            // OPTION 1: If Spring Boot serves both HTML and API (single Render service)
+            const BASE_API_URL = 'https://milker-app-service.onrender.com/api';
+
+            
             const CART_API_URL = `${BASE_API_URL}/cart`;
             const CHECKOUT_API_URL = `${BASE_API_URL}/checkout`;
             const CSRF_TOKEN_API_URL = `${BASE_API_URL}/csrf-token`;
@@ -483,7 +487,7 @@
                     if (!csrfToken) {
                         await fetchAndSetCsrfToken();
                         if (!csrfToken) {
-                            throw new Error('CSRF token not available for authenticated request.');
+                            throw new Error('CSRF token not available for authenticated request. Operation aborted.');
                         }
                     }
                     options.headers = {
@@ -501,7 +505,14 @@
                 if (response.status === 403) {
                     const errorText = await response.text();
                     console.error('Fetch 403 Error:', errorText);
-                    throw new Error(`Permission Denied (403). Possible CSRF issue or unauthenticated access. Server response: ${errorText.substring(0, Math.min(errorText.length, 200))}...`);
+                    alert(`Access Denied (403). Your session might have expired or you don't have permission. Please log in again.`);
+                    // You might want to redirect to login page here if 403 means session expired
+                    // window.location.href = '/oauth2/authorization/google';
+                    throw new Error(`Permission Denied (403). Server response: ${errorText.substring(0, Math.min(errorText.length, 200))}...`);
+                } else if (response.status === 401) {
+                    alert('You need to be logged in to perform this action. Redirecting to login...');
+                    window.location.href = '/oauth2/authorization/google'; // Redirect to Google login
+                    throw new Error('Unauthorized (401).');
                 }
 
                 return response;
@@ -613,8 +624,10 @@
 
                     alert(`Payment successful! Your Order ID: ${orderConfirmation.orderId || 'N/A'}. Your order will be delivered soon.`);
 
+                    // Clear the cart after successful order placement
                     await authenticatedFetch(CART_API_URL + '/clear', { method: 'DELETE' });
 
+                    // Redirect to a confirmation page or home page
                     window.location.href = 'index.html';
 
                 } catch (error) {
