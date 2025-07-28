@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -828,7 +826,11 @@
             const loginLink = document.getElementById('loginLink');
             const logoutLink = document.getElementById('logoutLink'); // Keep this, it's inside auth-controls
 
-            const BASE_API_URL = 'http://localhost:8080/api';
+            // ***** IMPORTANT CHANGE MADE HERE *****
+            // This is the core fix for the "localhost" issue.
+            // Changed 'http://localhost:8080/api' to just '/api'.
+            // Since Spring Boot serves both frontend and backend, relative paths are correct for deployment.
+            const BASE_API_URL = '/api';
             const PRODUCTS_API_URL = `${BASE_API_URL}/products`;
             const CART_API_URL = `${BASE_API_URL}/cart`;
             const CSRF_TOKEN_API_URL = `${BASE_API_URL}/csrf-token`;
@@ -840,6 +842,7 @@
             // --- Authentication Status Check ---
             async function isAuthenticated() {
                 try {
+                    // Uses CURRENT_USER_API_URL which now correctly resolves to a relative path
                     const response = await fetch(CURRENT_USER_API_URL);
                     if (response.ok) {
                         const currentUser = await response.json();
@@ -872,6 +875,7 @@
             // --- CSRF Token Management ---
             async function fetchAndSetCsrfToken() {
                 try {
+                    // Uses CSRF_TOKEN_API_URL which now correctly resolves to a relative path
                     const response = await fetch(CSRF_TOKEN_API_URL);
                     if (!response.ok) {
                         throw new Error(`Failed to fetch CSRF token: ${response.status} - ${response.statusText}`);
@@ -880,7 +884,7 @@
                     console.log('CSRF token fetched:', csrfToken);
                 } catch (error) {
                     console.error('Error fetching CSRF token:', error);
-                    showMessage(productsContainer, `<i class="fas fa-exclamation-triangle"></i> Failed to initialize: Could not fetch security token. Please refresh.`, true);
+                    showMessage(productsContainer, `<i class="fas fa-exclamation-triangle"></i> Failed to initialize: Could not fetch security token. Please refresh.`, 'error');
                     // Disable core functionalities if CSRF token is crucial and missing
                 }
             }
@@ -903,6 +907,8 @@
                     options.headers['Content-Type'] = 'application/json';
                 }
 
+                // The 'url' parameter here will already be a relative path (e.g., '/api/products', '/api/cart/add')
+                // because of how PRODUCTS_API_URL, CART_API_URL etc. are constructed.
                 const response = await fetch(url, options);
 
                 if (response.status === 403) {
@@ -930,6 +936,7 @@
             async function fetchProducts() {
                 showMessage(productsContainer, '<i class="fas fa-spinner fa-spin"></i> Loading products...', 'loading');
                 try {
+                    // Uses PRODUCTS_API_URL which now correctly resolves to a relative path
                     const response = await authenticatedFetch(PRODUCTS_API_URL);
                     if (!response.ok) {
                         throw new Error(`HTTP error! status: ${response.status} - ${response.statusText}`);
@@ -991,6 +998,7 @@
 
             async function fetchCart() {
                 try {
+                    // Uses CART_API_URL which now correctly resolves to a relative path
                     const response = await authenticatedFetch(CART_API_URL);
                     if (!response.ok) {
                         throw new Error(`HTTP error! status: ${response.status} - ${response.statusText}`);
@@ -1020,6 +1028,7 @@
 
             async function addProductToCart(productId, quantity = 1) {
                 try {
+                    // Uses CART_API_URL which now correctly resolves to a relative path
                     const response = await authenticatedFetch(`${CART_API_URL}/add`, {
                         method: 'POST',
                         body: JSON.stringify({ productId: productId, quantity: quantity })
@@ -1044,6 +1053,7 @@
                     return;
                 }
                 try {
+                    // Uses CART_API_URL which now correctly resolves to a relative path
                     const response = await authenticatedFetch(`${CART_API_URL}/${cartItemId}`, {
                         method: 'PUT',
                         body: JSON.stringify({ newQuantity: newQuantity })
@@ -1066,6 +1076,7 @@
                     return;
                 }
                 try {
+                    // Uses CART_API_URL which now correctly resolves to a relative path
                     const response = await authenticatedFetch(`${CART_API_URL}/${cartItemId}`, {
                         method: 'DELETE'
                     });
@@ -1088,6 +1099,7 @@
                     return;
                 }
                 try {
+                    // Uses CART_API_URL which now correctly resolves to a relative path
                     const response = await authenticatedFetch(`${CART_API_URL}/clear`, {
                         method: 'DELETE'
                     });
