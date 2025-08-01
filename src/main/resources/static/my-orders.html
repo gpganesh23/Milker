@@ -1,5 +1,4 @@
 
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -818,7 +817,7 @@
             const cartOverlay = document.getElementById('cart-overlay');
             const closeCartBtn = document.getElementById('close-cart-btn');
 
-            // Renamed for clarity within the modal context
+            
             const cartModalItemsContainer = document.getElementById('cart-modal-items-container');
             const cartTotalAmountModalSpan = document.getElementById('cart-total-amount-modal');
             const clearCartModalBtn = document.getElementById('clear-cart-modal-btn');
@@ -1196,8 +1195,7 @@
                 }
             });
 
-            // --- Initial Page Load ---
-            // Fetch authentication status, CSRF token, then products and cart
+
             isAuthenticated().then(() => {
                 fetchAndSetCsrfToken().then(() => {
                     fetchProducts();

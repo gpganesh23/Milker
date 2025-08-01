@@ -17,16 +17,16 @@ import java.util.Optional; // Import Optional
 public class ProductController {
 
     @Autowired
-    private ProductService productService; // <--- CHANGE: Inject ProductService
+    private ProductService productService; 
 
     @GetMapping
     public ResponseEntity<List<Product>> getProducts() {
-        return ResponseEntity.ok(productService.findAllProducts()); // <--- CHANGE: Use ProductService
+        return ResponseEntity.ok(productService.findAllProducts());
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<Product> getProductById(@PathVariable Long id) {
-        return productService.findProductById(id) // <--- CHANGE: Use ProductService
+        return productService.findProductById(id) 
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
